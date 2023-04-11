@@ -1,16 +1,24 @@
-import { DEFAULT_VALIDATOR, Validator } from "./validation.js";
-import { useCallback, useContext, useEffect, useState } from "react";
-import classnames from "classnames";
-import { compose, email, required } from "./validation.js";
-import Context from "./context.js";
+import { DEFAULT_VALIDATOR, Validator } from './validation.js'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { compose, email, required } from './validation.js'
+import Context from './context.js'
+
+export interface FormClassNames {
+  form?: string
+  item?: string
+  label?: string
+  field?: string
+  suffix?: string
+  validation?: string
+}
 
 export interface Props {
-  label: string;
-  name: string;
-  showErrors?: boolean;
-  suffix?: string;
-  type: "email" | "password" | "number";
-  validate?: Validator;
+  label: string
+  name: string
+  showErrors?: boolean
+  suffix?: string
+  type: 'email' | 'password' | 'number'
+  validate?: Validator
 }
 
 let Input = ({
@@ -21,56 +29,66 @@ let Input = ({
   showErrors = true,
   suffix,
 }: Props) => {
-  let { addField, fields, setField } = useContext(Context);
-  let [touched, setTouched] = useState(false);
+  let { addField, fields, setField, classNames } = useContext(Context)
+  let [touched, setTouched] = useState(false)
 
-  validate ??= DEFAULT_VALIDATOR;
+  validate ??= DEFAULT_VALIDATOR
 
   useEffect(() => {
     switch (type) {
-      case "email":
-        validate = compose(email, validate!);
-        break;
-      case "password":
-        validate = compose(required, validate!);
-        break;
+      case 'email':
+        validate = compose(email, validate!)
+        break
+      case 'password':
+        validate = compose(required, validate!)
+        break
     }
-    addField(name, validate);
-  }, [addField, name, type, validate]);
+    addField(name, validate)
+  }, [addField, name, type, validate])
 
   let onChange = useCallback(
     (event: React.ChangeEvent) => {
-      let value = (event.currentTarget as HTMLInputElement).value;
-      setField(name, value);
-      setTouched(true);
+      let value = (event.currentTarget as HTMLInputElement).value
+      setField(name, value)
+      setTouched(true)
     },
     [name, setField]
-  );
+  )
 
   let onBlur = useCallback(() => {
-    setTouched(true);
-  }, [setTouched]);
+    setTouched(true)
+  }, [setTouched])
 
-  let error = fields[name]?.error;
-  let invalid = !!error;
+  let error = fields[name]?.error
+  let invalid = !!error
 
   return (
-    <div className={classnames("form-item", { touched, invalid })}>
+    <div
+      className={`${classNames.item ?? 'form-item'}${touched && ' touched'}${
+        invalid && ' invalid'
+      }`}
+    >
       <label>
-        <span className="form-item-label">{label}</span>
+        <span className={classNames.label ?? 'form-item-label'}>{label}</span>
       </label>
       <input
-        className="form-item-field"
+        className={classNames.field ?? 'form-item-field'}
         type={type}
         onChange={onChange}
         onBlur={onBlur}
       />
-      {suffix && <span className="form-item-suffix">{suffix}</span>}
+      {suffix && (
+        <span className={classNames.suffix ?? 'form-item-suffix'}>
+          {suffix}
+        </span>
+      )}
       {showErrors && (
-        <div className="validation-error">{error || "\u00A0"}</div>
+        <div className={classNames.validation ?? 'validation-error'}>
+          {error || '\u00A0'}
+        </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Input;
+export default Input
