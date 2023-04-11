@@ -1,11 +1,11 @@
-import { useCallback, useContext } from 'react'
+import { forwardRef, useCallback, useContext } from 'react'
 import { FormContext } from './context.js'
 
 export interface Props {
   label: string
 }
 
-let Submit = ({ label }: Props) => {
+export let Submit = forwardRef<HTMLInputElement, Props>(({ label }, ref) => {
   let { fields, onSubmit } = useContext(FormContext)
   let disabled = Object.values(fields).some(({ error }) => error !== false)
   let onSubmitClick = useCallback(
@@ -18,12 +18,11 @@ let Submit = ({ label }: Props) => {
 
   return (
     <input
+      ref={ref}
       type="submit"
       value={label}
       onClick={onSubmitClick}
       disabled={disabled}
     />
   )
-}
-
-export default Submit
+})

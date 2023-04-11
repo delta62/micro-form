@@ -1,6 +1,7 @@
 import {
   DetailedHTMLProps,
   InputHTMLAttributes,
+  forwardRef,
   useCallback,
   useContext,
   useEffect,
@@ -57,81 +58,87 @@ const DEFAULT_CLASS_NAMES: ItemClassNames = {
   validation: 'validation-error',
 }
 
-let Input = ({
-  label,
-  name,
-  type,
-  validate = DEFAULT_VALIDATOR,
-  showErrors = true,
-  suffix,
-  htmlProps = {},
-  classNames = {},
-}: Props) => {
-  let {
-    addField,
-    fields,
-    setField,
-    classNames: formClassNames,
-  } = useContext(FormContext)
-  let [touched, setTouched] = useState(false)
-
-  classNames = { ...DEFAULT_CLASS_NAMES, ...formClassNames, ...classNames }
-
-  useEffect(() => {
-    switch (type) {
-      case 'email':
-        validate = compose(email, validate!)
-        break
-      case 'password':
-        validate = compose(required, validate!)
-        break
-    }
-    addField(name, validate)
-  }, [addField, name, type, validate])
-
-  let onChange = useCallback(
-    (event: React.ChangeEvent) => {
-      let value = (event.currentTarget as HTMLInputElement).value
-      setField(name, value)
-      setTouched(true)
+let Input = forwardRef<HTMLInputElement, Props>(
+  (
+    {
+      label,
+      name,
+      type,
+      validate = DEFAULT_VALIDATOR,
+      showErrors = true,
+      suffix,
+      htmlProps = {},
+      classNames = {},
     },
-    [name, setField]
-  )
+    ref
+  ) => {
+    let {
+      addField,
+      fields,
+      setField,
+      classNames: formClassNames,
+    } = useContext(FormContext)
+    let [touched, setTouched] = useState(false)
 
-  let onBlur = useCallback(() => {
-    setTouched(true)
-  }, [setTouched])
+    classNames = { ...DEFAULT_CLASS_NAMES, ...formClassNames, ...classNames }
 
-  let error = fields[name]?.error
-  let invalid = !!error
-  let formItemClassName = [
-    classNames.item,
-    touched && classNames.touched,
-    invalid && classNames.invalid,
-  ]
-    .filter(x => !!x)
-    .join(' ')
+    useEffect(() => {
+      switch (type) {
+        case 'email':
+          validate = compose(email, validate!)
+          break
+        case 'password':
+          validate = compose(required, validate!)
+          break
+      }
+      addField(name, validate)
+    }, [addField, name, type, validate])
 
-  return (
-    <div className={formItemClassName}>
-      {label && (
-        <label>
-          <span className={classNames.label}>{label}</span>
-        </label>
-      )}
-      <input
-        className={classNames.field}
-        type={type}
-        onChange={onChange}
-        onBlur={onBlur}
-        {...htmlProps}
-      />
-      {suffix && <span className={classNames.suffix}>{suffix}</span>}
-      {showErrors && (
-        <div className={classNames.validation}>{error || '\u00A0'}</div>
-      )}
-    </div>
-  )
-}
+    let onChange = useCallback(
+      (event: React.ChangeEvent) => {
+        let value = (event.currentTarget as HTMLInputElement).value
+        setField(name, value)
+        setTouched(true)
+      },
+      [name, setField]
+    )
+
+    let onBlur = useCallback(() => {
+      setTouched(true)
+    }, [setTouched])
+
+    let error = fields[name]?.error
+    let invalid = !!error
+    let formItemClassName = [
+      classNames.item,
+      touched && classNames.touched,
+      invalid && classNames.invalid,
+    ]
+      .filter(x => !!x)
+      .join(' ')
+
+    return (
+      <div className={formItemClassName}>
+        {label && (
+          <label>
+            <span className={classNames.label}>{label}</span>
+          </label>
+        )}
+        <input
+          ref={ref}
+          className={classNames.field}
+          type={type}
+          onChange={onChange}
+          onBlur={onBlur}
+          {...htmlProps}
+        />
+        {suffix && <span className={classNames.suffix}>{suffix}</span>}
+        {showErrors && (
+          <div className={classNames.validation}>{error || '\u00A0'}</div>
+        )}
+      </div>
+    )
+  }
+)
 
 export default Input
