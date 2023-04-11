@@ -1,7 +1,24 @@
-import { DEFAULT_VALIDATOR, Validator } from './validation.js'
-import { useCallback, useContext, useEffect, useState } from 'react'
-import { compose, email, required } from './validation.js'
-import Context from './context.js'
+import {
+  DetailedHTMLProps,
+  InputHTMLAttributes,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
+import {
+  DEFAULT_VALIDATOR,
+  Validator,
+  compose,
+  email,
+  required,
+} from './validation.js'
+import { FormContext } from './context.js'
+
+export type HtmlInputProps = DetailedHTMLProps<
+  InputHTMLAttributes<HTMLInputElement>,
+  HTMLInputElement
+>
 
 export interface FormClassNames {
   form?: string
@@ -9,30 +26,56 @@ export interface FormClassNames {
   label?: string
   field?: string
   suffix?: string
+  touched?: string
+  invalid?: string
   validation?: string
 }
 
+export type ItemClassNames = Pick<
+  FormClassNames,
+  'item' | 'label' | 'field' | 'suffix' | 'validation' | 'touched' | 'invalid'
+>
+
 export interface Props {
-  label: string
+  label?: string
   name: string
   showErrors?: boolean
   suffix?: string
   type: 'email' | 'password' | 'number'
   validate?: Validator
+  htmlProps?: HtmlInputProps
+  classNames?: ItemClassNames
+}
+
+const DEFAULT_CLASS_NAMES: ItemClassNames = {
+  invalid: 'invalid',
+  item: 'form-item',
+  label: 'form-item-label',
+  field: 'form-item-field',
+  suffix: 'form-item-suffix',
+  touched: 'touched',
+  validation: 'validation-error',
 }
 
 let Input = ({
   label,
   name,
   type,
-  validate,
+  validate = DEFAULT_VALIDATOR,
   showErrors = true,
   suffix,
+  htmlProps = {},
+  classNames = {},
 }: Props) => {
-  let { addField, fields, setField, classNames } = useContext(Context)
+  let {
+    addField,
+    fields,
+    setField,
+    classNames: formClassNames,
+  } = useContext(FormContext)
   let [touched, setTouched] = useState(false)
 
-  validate ??= DEFAULT_VALIDATOR
+  classNames = { ...DEFAULT_CLASS_NAMES, ...formClassNames, ...classNames }
 
   useEffect(() => {
     switch (type) {
@@ -61,34 +104,31 @@ let Input = ({
 
   let error = fields[name]?.error
   let invalid = !!error
-  let className = [
-    classNames.item ?? 'form-item',
-    touched && 'touched',
-    invalid && 'invalid',
+  let formItemClassName = [
+    classNames.item,
+    touched && classNames.touched,
+    invalid && classNames.invalid,
   ]
     .filter(x => !!x)
     .join(' ')
 
   return (
-    <div className={className}>
-      <label>
-        <span className={classNames.label ?? 'form-item-label'}>{label}</span>
-      </label>
+    <div className={formItemClassName}>
+      {label && (
+        <label>
+          <span className={classNames.label}>{label}</span>
+        </label>
+      )}
       <input
-        className={classNames.field ?? 'form-item-field'}
+        className={classNames.field}
         type={type}
         onChange={onChange}
         onBlur={onBlur}
+        {...htmlProps}
       />
-      {suffix && (
-        <span className={classNames.suffix ?? 'form-item-suffix'}>
-          {suffix}
-        </span>
-      )}
+      {suffix && <span className={classNames.suffix}>{suffix}</span>}
       {showErrors && (
-        <div className={classNames.validation ?? 'validation-error'}>
-          {error || '\u00A0'}
-        </div>
+        <div className={classNames.validation}>{error || '\u00A0'}</div>
       )}
     </div>
   )

@@ -18,7 +18,7 @@ interface Context {
   setField(name: string, value: string): void
 }
 
-let FormContext = createContext<Context>({
+export let FormContext = createContext<Context>({
   fields: {},
   classNames: {},
   onSubmit() {},
@@ -26,5 +26,3 @@ let FormContext = createContext<Context>({
   setField() {},
 })
 FormContext.displayName = 'Form'
-
-export default FormContext

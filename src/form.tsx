@@ -1,25 +1,26 @@
 import { PropsWithChildren, useCallback, useState } from 'react'
-import FormContext, { FormItem } from './context.js'
+import { FormContext, FormItem } from './context'
 import { Validator, DEFAULT_VALIDATOR } from './validation'
 import { FormClassNames } from './input'
 
-type Fields<TFields = unknown> = Record<keyof TFields, FormItem>
+type Fields = Record<string, FormItem>
+export type FieldValues = Record<string, string>
 
-export interface Props<T extends {}> {
+export interface Props {
   classNames?: FormClassNames
-  onSubmit(fields: T): void
+  onSubmit(fields: FieldValues): void
 }
 
-let Form = <T extends {}>({
+export let Form = ({
   children,
   onSubmit,
-  classNames,
-}: PropsWithChildren<Props<T>>) => {
-  let [fields, setFields] = useState<Fields<T>>({} as Fields<T>)
+  classNames = {},
+}: PropsWithChildren<Props>) => {
+  let [fields, setFields] = useState<Fields>({})
 
   let setField = useCallback(
-    (name: keyof T, value: string) => {
-      setFields((fields: Fields<T>) => {
+    (name: string, value: string) => {
+      setFields(fields => {
         // First update the new value
         let { validator } = fields[name]!
         let error = validator(value, fields)
@@ -47,12 +48,12 @@ let Form = <T extends {}>({
   )
 
   let onSubmitCallback = useCallback(() => {
-    let formState = (Object.entries(fields) as [keyof T, FormItem][]).reduce(
+    let formState = Object.entries(fields).reduce<FieldValues>(
       (acc, [key, val]) => {
-        acc[key] = val.value as T[keyof T]
+        acc[key] = val.value
         return acc
       },
-      {} as T
+      {}
     )
     onSubmit(formState)
   }, [fields, onSubmit])
@@ -63,9 +64,9 @@ let Form = <T extends {}>({
         value={{
           addField,
           fields,
-          classNames: classNames ?? {},
+          classNames,
           onSubmit: onSubmitCallback,
-          setField: setField as any,
+          setField,
         }}
       >
         {children}
@@ -73,5 +74,3 @@ let Form = <T extends {}>({
     </form>
   )
 }
-
-export default Form

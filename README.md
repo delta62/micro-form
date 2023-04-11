@@ -1,4 +1,4 @@
-# `forms`
+# `micro-form`
 
 A tiny form library for React
 
