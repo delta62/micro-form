@@ -7,11 +7,20 @@ import Context from "./context.js";
 export interface Props {
   label: string;
   name: string;
+  showErrors?: boolean;
+  suffix?: string;
   type: "email" | "password" | "number";
   validate?: Validator;
 }
 
-let Input = ({ label, name, type, validate }: Props) => {
+let Input = ({
+  label,
+  name,
+  type,
+  validate,
+  showErrors = true,
+  suffix,
+}: Props) => {
   let { addField, fields, setField } = useContext(Context);
   let [touched, setTouched] = useState(false);
 
@@ -56,7 +65,10 @@ let Input = ({ label, name, type, validate }: Props) => {
         onChange={onChange}
         onBlur={onBlur}
       />
-      <div className="validation-error">{error || "\u00A0"}</div>
+      {suffix && <span className="form-item-suffix">{suffix}</span>}
+      {showErrors && (
+        <div className="validation-error">{error || "\u00A0"}</div>
+      )}
     </div>
   );
 };
