@@ -61,13 +61,16 @@ let Input = ({
 
   let error = fields[name]?.error
   let invalid = !!error
+  let className = [
+    classNames.item ?? 'form-item',
+    touched && 'touched',
+    invalid && 'invalid',
+  ]
+    .filter(x => !!x)
+    .join(' ')
 
   return (
-    <div
-      className={`${classNames.item ?? 'form-item'}${touched && ' touched'}${
-        invalid && ' invalid'
-      }`}
-    >
+    <div className={className}>
       <label>
         <span className={classNames.label ?? 'form-item-label'}>{label}</span>
       </label>
