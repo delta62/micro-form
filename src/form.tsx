@@ -1,9 +1,8 @@
 import { PropsWithChildren, useCallback, useState } from 'react'
-import { FormContext, FormItem } from './context'
+import { FormContext, Fields } from './context'
 import { Validator, DEFAULT_VALIDATOR } from './validation'
 import { FormClassNames } from './input'
 
-type Fields = Record<string, FormItem>
 export type FieldValues = Record<string, string>
 
 export interface Props {
