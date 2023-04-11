@@ -1,15 +1,18 @@
 import { forwardRef } from 'react'
 import { Validator } from './validation'
 import { Submit } from './submit'
-import Input, { HtmlInputProps } from './input'
+import { Input, HtmlInputProps } from './input'
 
-interface Field<T extends string> {
+export type InputType = 'email' | 'number' | 'password' | 'submit'
+
+interface Field<T extends InputType> {
   label: string
   type: T
 }
 
-interface InputField extends Field<'email' | 'number' | 'password'> {
-  htmlProps?: HtmlInputProps
+interface InputField<T extends InputType>
+  extends Field<T>,
+    Omit<HtmlInputProps, 'type'> {
   name: string
   showErrors?: boolean
   suffix?: string
@@ -18,23 +21,33 @@ interface InputField extends Field<'email' | 'number' | 'password'> {
 
 interface SubmitField extends Field<'submit'> {}
 
-export type Props = InputField | SubmitField
+export type Props = InputField<'number' | 'email' | 'password'> | SubmitField
 
 export let FormItem = forwardRef<HTMLInputElement, Props>((props, ref) => {
   if (props.type === 'submit') {
     return <Submit ref={ref} label={props.label} />
   }
 
+  let {
+    label,
+    name,
+    type,
+    validate,
+    suffix,
+    showErrors = true,
+    ...htmlProps
+  } = props
+
   return (
     <Input
       ref={ref}
-      label={props.label}
-      name={props.name}
-      type={props.type}
-      validate={props.validate}
-      suffix={props.suffix}
-      showErrors={props.showErrors ?? true}
-      htmlProps={props.htmlProps}
+      label={label}
+      name={name}
+      type={type}
+      validate={validate}
+      suffix={suffix}
+      showErrors={showErrors}
+      {...htmlProps}
     />
   )
 })

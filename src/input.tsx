@@ -1,5 +1,4 @@
 import {
-  DetailedHTMLProps,
   InputHTMLAttributes,
   forwardRef,
   useCallback,
@@ -16,10 +15,7 @@ import {
 } from './validation'
 import { FormContext } from './context'
 
-export type HtmlInputProps = DetailedHTMLProps<
-  InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->
+export type HtmlInputProps = InputHTMLAttributes<HTMLInputElement>
 
 export interface FormClassNames {
   form?: string
@@ -37,14 +33,13 @@ export type ItemClassNames = Pick<
   'item' | 'label' | 'field' | 'suffix' | 'validation' | 'touched' | 'invalid'
 >
 
-export interface Props {
+export interface Props extends HtmlInputProps {
   label?: string
   name: string
   showErrors?: boolean
   suffix?: string
   type: 'email' | 'password' | 'number'
   validate?: Validator
-  htmlProps?: HtmlInputProps
   classNames?: ItemClassNames
 }
 
@@ -58,7 +53,7 @@ const DEFAULT_CLASS_NAMES: ItemClassNames = {
   validation: 'validation-error',
 }
 
-let Input = forwardRef<HTMLInputElement, Props>(
+export let Input = forwardRef<HTMLInputElement, Props>(
   (
     {
       label,
@@ -67,8 +62,8 @@ let Input = forwardRef<HTMLInputElement, Props>(
       validate = DEFAULT_VALIDATOR,
       showErrors = true,
       suffix,
-      htmlProps = {},
       classNames = {},
+      ...props
     },
     ref
   ) => {
@@ -131,7 +126,7 @@ let Input = forwardRef<HTMLInputElement, Props>(
           type={type}
           onChange={onChange}
           onBlur={onBlur}
-          {...htmlProps}
+          {...props}
         />
         {suffix && <span className={classNames.suffix}>{suffix}</span>}
         {showErrors && (
@@ -141,5 +136,3 @@ let Input = forwardRef<HTMLInputElement, Props>(
     )
   }
 )
-
-export default Input
