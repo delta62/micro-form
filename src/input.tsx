@@ -13,8 +13,8 @@ import {
   compose,
   email,
   required,
-} from './validation.js'
-import { FormContext } from './context.js'
+} from './validation'
+import { FormContext } from './context'
 
 export type HtmlInputProps = DetailedHTMLProps<
   InputHTMLAttributes<HTMLInputElement>,
@@ -88,6 +88,7 @@ let Input = forwardRef<HTMLInputElement, Props>(
           validate = compose(email, validate!)
           break
         case 'password':
+        case 'number':
           validate = compose(required, validate!)
           break
       }

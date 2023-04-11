@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useContext } from 'react'
-import { FormContext } from './context.js'
+import { FormContext } from './context'
 
 export interface Props {
   label: string
