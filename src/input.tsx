@@ -38,7 +38,7 @@ export interface Props extends HtmlInputProps {
   name: string
   showErrors?: boolean
   suffix?: string
-  type: 'email' | 'password' | 'number'
+  type: 'email' | 'password' | 'number' | 'radio'
   validate?: Validator
   classNames?: ItemClassNames
 }
@@ -84,6 +84,7 @@ export let Input = forwardRef<HTMLInputElement, Props>(
           break
         case 'password':
         case 'number':
+        case 'radio':
           validate = compose(required, validate!)
           break
       }

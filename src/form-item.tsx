@@ -3,7 +3,7 @@ import { Validator } from './validation'
 import { Submit } from './submit'
 import { Input, HtmlInputProps } from './input'
 
-export type InputType = 'email' | 'number' | 'password' | 'submit'
+export type InputType = 'email' | 'number' | 'password' | 'submit' | 'radio'
 
 interface Field<T extends InputType> {
   label: string
@@ -21,7 +21,9 @@ interface InputField<T extends InputType>
 
 interface SubmitField extends Field<'submit'> {}
 
-export type Props = InputField<'number' | 'email' | 'password'> | SubmitField
+export type Props =
+  | InputField<'number' | 'email' | 'password' | 'radio'>
+  | SubmitField
 
 export let FormItem = forwardRef<HTMLInputElement, Props>((props, ref) => {
   if (props.type === 'submit') {
