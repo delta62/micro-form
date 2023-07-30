@@ -2,19 +2,20 @@ import { PropsWithChildren, useCallback, useState } from 'react'
 import { FormContext, Fields } from './context'
 import { Validator, DEFAULT_VALIDATOR } from './validation'
 import { FormClassNames } from './input'
+import { StringValues } from './types'
 
 export type FieldValues = Record<string, string>
 
-export interface Props {
+export interface Props<T> {
   classNames?: FormClassNames
-  onSubmit(fields: FieldValues): void
+  onSubmit(fields: StringValues<T>): void
 }
 
-export let Form = ({
+export let Form = <T extends {}>({
   children,
   onSubmit,
   classNames = {},
-}: PropsWithChildren<Props>) => {
+}: PropsWithChildren<Props<T>>) => {
   let [fields, setFields] = useState<Fields>({})
 
   let setField = useCallback(
@@ -54,7 +55,7 @@ export let Form = ({
       },
       {}
     )
-    onSubmit(formState)
+    onSubmit(formState as any)
   }, [fields, onSubmit])
 
   return (
